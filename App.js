@@ -5,6 +5,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { AntDesign } from '@expo/vector-icons';
 import Parse from 'parse/react-native.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import 'react-native-get-random-values';
+
 
 import Home from './components/Home';
 import ExibirCaminho from './components/ExibirCaminho';
