@@ -20,14 +20,20 @@ const ListarRotas = () => {
     buscarRotas();
   }, []);
 
-  const renderItem = ({ item }) => (
-    <View style={styles.item}>
-      <Text style={styles.texto}>Rota ID: {item.id}</Text>
-      <Text style={styles.texto}>Nome: {item.get('nome') || 'Sem nome'}</Text>
-      <Text style={styles.texto}>Pontos: {item.get('latitude')?.length || 0}</Text>
-      <Text style={styles.texto}>Data e Hora: {item.get('data')?.toLocaleString() || 'Sem data'}</Text>
-    </View>
-  );
+  const renderItem = ({ item }) => {
+    const nome = item.get('name') || 'Sem nome'; // Certifique-se de que o campo é 'name' se não é 'nome'
+    const latitude = item.get('latitude') || [];
+    const data = item.get('timestamp') ? new Date(item.get('timestamp')) : new Date(); // Certifique-se de que o campo é 'timestamp'
+
+    return (
+      <View style={styles.item}>
+        <Text style={styles.texto}>Rota ID: {item.id}</Text>
+        <Text style={styles.texto}>Nome: {nome}</Text>
+        <Text style={styles.texto}>Pontos: {latitude.length}</Text>
+        <Text style={styles.texto}>Data e Hora: {data.toLocaleString()}</Text>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -45,19 +51,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: '#F5F5F5', // Adicionado para uma aparência mais suave
   },
   titulo: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: '#333333', // Melhor contraste
   },
   item: {
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+    backgroundColor: '#FFFFFF', // Fundo branco para melhor leitura
+    marginBottom: 10, // Espaço entre itens
   },
   texto: {
     fontSize: 16,
+    color: '#333333', // Melhor contraste para o texto
   },
 });
 

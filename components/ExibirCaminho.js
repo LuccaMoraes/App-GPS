@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import 'react-native-get-random-values';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import MapView, { Polyline, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import Parse from 'parse/react-native.js';
-import 'react-native-get-random-values';
+
 
 // Inicialize o Parse
 Parse.initialize('mztd62TNdIWwMtKqgZX8XPAs8nVjNkKWAzEBPQN3', 'bjkBkYiEaKV8i3PKbGZhukYfF4HzPIzlIyqAj4P7');
@@ -12,13 +13,23 @@ Parse.serverURL = 'https://parseapi.back4app.com/';
 const ExibirCaminho = () => {
   const [Caminho, ColocarCaminho] = useState(false);
   const [route, colocarRota] = useState([]);
-  const [routeName, setRouteName] = useState(''); // Estado para o nome da rota
+  const [routeName, setRouteName] = useState('');
   const [initialRegion, setInitialRegion] = useState({
     latitude: -23.55052,
     longitude: -46.633308,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
-  }); // Estado para a região inicial do mapa
+  });
+  const watchId = useRef(null);
+
+  useEffect(() => {
+    // Cleanup function to stop watching location when the component unmounts
+    return () => {
+      if (watchId.current) {
+        watchId.current.remove();
+      }
+    };
+  }, []);
 
   const ComecarCaminho = async () => {
     ColocarCaminho(true);
@@ -27,7 +38,7 @@ const ExibirCaminho = () => {
       alert('Permission to access location was denied');
       return;
     }
-    Location.watchPositionAsync(
+    watchId.current = await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.High,
         timeInterval: 1000,
@@ -50,27 +61,26 @@ const ExibirCaminho = () => {
   };
 
   const PararCaminho = async () => {
+    if (watchId.current) {
+      watchId.current.remove();
+    }
     ColocarCaminho(false);
     const RouteObject = new Parse.Object('Rota');
 
-    // Separando latitude e longitude
     const latitudeArray = route.map(coord => coord.latitude);
     const longitudeArray = route.map(coord => coord.longitude);
-
-    // Capturando a data e hora atual
     const currentDate = new Date();
 
-    // Salvando latitude, longitude, nome da rota e data/hora
     RouteObject.set('latitude', latitudeArray);
     RouteObject.set('longitude', longitudeArray);
     RouteObject.set('name', routeName);
-    RouteObject.set('timestamp', currentDate); // Salvando a data e hora atuais
-    
+    RouteObject.set('timestamp', currentDate);
+
     try {
       await RouteObject.save();
       alert('Route saved successfully!');
       colocarRota([]);
-      setRouteName(''); // Limpar o nome da rota após salvar
+      setRouteName('');
     } catch (error) {
       alert('Falha em salvar rota: ' + error.message);
       console.error('Erro ao salvar a rota:', error);
@@ -81,7 +91,6 @@ const ExibirCaminho = () => {
     <View style={styles.container}>
       <Text style={styles.titulo}>Caminho Route</Text>
       
-      {/* Campo de entrada para o nome da rota */}
       <TextInput
         style={styles.input}
         placeholder="Nome da Rota"
@@ -89,7 +98,6 @@ const ExibirCaminho = () => {
         onChangeText={setRouteName}
       />
 
-      {/* Mapa interativo */}
       <MapView
         style={styles.map}
         initialRegion={initialRegion}
@@ -97,8 +105,8 @@ const ExibirCaminho = () => {
       >
         <Polyline
           coordinates={route}
-          strokeColor="#000" // cor da linha
-          strokeWidth={6}    // espessura da linha
+          strokeColor="#000"
+          strokeWidth={6}
         />
         {route.map((coord, index) => (
           <Marker key={index} coordinate={coord} />

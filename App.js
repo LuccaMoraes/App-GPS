@@ -1,3 +1,4 @@
+import 'react-native-get-random-values';
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -5,13 +6,13 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { AntDesign } from '@expo/vector-icons';
 import Parse from 'parse/react-native.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import 'react-native-get-random-values';
 
 
 import Home from './components/Home';
 import ExibirCaminho from './components/ExibirCaminho';
 import ListarRotas from './components/ListarRotas';
 
+// Configure o Parse
 Parse.setAsyncStorage(AsyncStorage);
 Parse.initialize('mztd62TNdIWwMtKqgZX8XPAs8nVjNkKWAzEBPQN3', 'bjkBkYiEaKV8i3PKbGZhukYfF4HzPIzlIyqAj4P7');
 Parse.serverURL = 'https://parseapi.back4app.com/';
