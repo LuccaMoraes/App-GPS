@@ -7,7 +7,7 @@ const ListarRotas = () => {
 
   useEffect(() => {
     const buscarRotas = async () => {
-      const Rota = Parse.Object.extend('Rota');
+      const Rota = Parse.Object.extend('rota');
       const query = new Parse.Query(Rota);
       try {
         const results = await query.find();
@@ -20,17 +20,29 @@ const ListarRotas = () => {
     buscarRotas();
   }, []);
 
+  const renderPonto = (ponto, index) => {
+    return (
+      <View key={index} style={styles.ponto}>
+        <Text style={styles.textoPonto}>
+          Ponto {index + 1}: Latitude: {ponto.latitude}, Longitude: {ponto.longitude}
+        </Text>
+      </View>
+    );
+  };
+
   const renderItem = ({ item }) => {
-    const nome = item.get('name') || 'Sem nome'; // Certifique-se de que o campo é 'name' se não é 'nome'
-    const latitude = item.get('latitude') || [];
-    const data = item.get('timestamp') ? new Date(item.get('timestamp')) : new Date(); // Certifique-se de que o campo é 'timestamp'
+    const nome = item.get('nome') || 'Sem nome';
+    const caminho = item.get('caminho') || [];
+    const data = item.get('timestamp') ? new Date(item.get('timestamp')) : new Date();
 
     return (
       <View style={styles.item}>
         <Text style={styles.texto}>Rota ID: {item.id}</Text>
         <Text style={styles.texto}>Nome: {nome}</Text>
-        <Text style={styles.texto}>Pontos: {latitude.length}</Text>
         <Text style={styles.texto}>Data e Hora: {data.toLocaleString()}</Text>
+        <Text style={styles.texto}>Total de Pontos: {caminho.length}</Text>
+
+        {caminho.map((ponto, index) => renderPonto(ponto, index))}
       </View>
     );
   };
@@ -51,24 +63,32 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#F5F5F5', // Adicionado para uma aparência mais suave
+    backgroundColor: '#F5F5F5',
   },
   titulo: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#333333', // Melhor contraste
+    color: '#333333',
   },
   item: {
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    backgroundColor: '#FFFFFF', // Fundo branco para melhor leitura
-    marginBottom: 10, // Espaço entre itens
+    backgroundColor: '#FFFFFF',
+    marginBottom: 10,
   },
   texto: {
     fontSize: 16,
-    color: '#333333', // Melhor contraste para o texto
+    color: '#333333',
+  },
+  ponto: {
+    marginTop: 5,
+    paddingLeft: 10,
+  },
+  textoPonto: {
+    fontSize: 14,
+    color: '#555555',
   },
 });
 

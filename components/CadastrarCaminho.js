@@ -5,15 +5,13 @@ import MapView, { Polyline, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import Parse from 'parse/react-native.js';
 
-
-// Inicialize o Parse
 Parse.initialize('mztd62TNdIWwMtKqgZX8XPAs8nVjNkKWAzEBPQN3', 'bjkBkYiEaKV8i3PKbGZhukYfF4HzPIzlIyqAj4P7');
 Parse.serverURL = 'https://parseapi.back4app.com/';
 
-const ExibirCaminho = () => {
+const CadastrarCaminho = () => {
   const [Caminho, ColocarCaminho] = useState(false);
-  const [route, colocarRota] = useState([]);
-  const [routeName, setRouteName] = useState('');
+  const [rota, colocarRota] = useState([]);
+  const [nome, setRouteName] = useState('');
   const [initialRegion, setInitialRegion] = useState({
     latitude: -23.55052,
     longitude: -46.633308,
@@ -21,12 +19,15 @@ const ExibirCaminho = () => {
     longitudeDelta: 0.0421,
   });
   const watchId = useRef(null);
+  const saveInterval = useRef(null);
 
   useEffect(() => {
-    // Cleanup function to stop watching location when the component unmounts
     return () => {
       if (watchId.current) {
         watchId.current.remove();
+      }
+      if (saveInterval.current) {
+        clearInterval(saveInterval.current);
       }
     };
   }, []);
@@ -35,9 +36,10 @@ const ExibirCaminho = () => {
     ColocarCaminho(true);
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
-      alert('Permission to access location was denied');
+      alert('Permissão para acessar a localização foi negada');
       return;
     }
+    
     watchId.current = await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.High,
@@ -58,43 +60,70 @@ const ExibirCaminho = () => {
         console.log('Nova localização capturada:', newCoord);
       }
     );
+
+    saveInterval.current = setInterval(SalvarPontoAtual, 1000);
+  };
+
+  const SalvarPontoAtual = async () => {
+    if (rota.length > 0) {
+      const ultimoPonto = rota[rota.length - 1];
+      const currentDate = new Date();
+
+      const PontoObject = new Parse.Object('PontoRota');
+      PontoObject.set('nome', nome);
+      PontoObject.set('latitude', ultimoPonto.latitude);
+      PontoObject.set('longitude', ultimoPonto.longitude);
+      PontoObject.set('timestamp', currentDate);
+
+      try {
+        await PontoObject.save();
+        console.log('Ponto salvo:', ultimoPonto);
+      } catch (error) {
+        console.log('Erro ao salvar ponto:', error.message);
+      }
+    }
   };
 
   const PararCaminho = async () => {
     if (watchId.current) {
       watchId.current.remove();
     }
+    if (saveInterval.current) {
+      clearInterval(saveInterval.current);
+    }
     ColocarCaminho(false);
-    const RouteObject = new Parse.Object('Rota');
 
-    const latitudeArray = route.map(coord => coord.latitude);
-    const longitudeArray = route.map(coord => coord.longitude);
+    if (!nome) {
+      alert('Por favor, insira um nome para a rota.');
+      return;
+    }
+
+    const RotaObject = new Parse.Object('rota');
     const currentDate = new Date();
 
-    RouteObject.set('latitude', latitudeArray);
-    RouteObject.set('longitude', longitudeArray);
-    RouteObject.set('name', routeName);
-    RouteObject.set('timestamp', currentDate);
+    RotaObject.set('nome', nome);
+    RotaObject.set('data', currentDate);
+    RotaObject.set('caminho', rota);
+    RotaObject.set('timestamp', currentDate);
 
     try {
-      await RouteObject.save();
-      alert('Route saved successfully!');
+      await RotaObject.save();
+      alert('Rota salva!');
       colocarRota([]);
       setRouteName('');
     } catch (error) {
       alert('Falha em salvar rota: ' + error.message);
-      console.error('Erro ao salvar a rota:', error);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>Caminho Route</Text>
+      <Text style={styles.titulo}>Caminho Rota</Text>
       
       <TextInput
         style={styles.input}
         placeholder="Nome da Rota"
-        value={routeName}
+        value={nome}
         onChangeText={setRouteName}
       />
 
@@ -104,19 +133,19 @@ const ExibirCaminho = () => {
         region={initialRegion}
       >
         <Polyline
-          coordinates={route}
+          coordinates={rota}
           strokeColor="#000"
           strokeWidth={6}
         />
-        {route.map((coord, index) => (
+        {rota.map((coord, index) => (
           <Marker key={index} coordinate={coord} />
         ))}
       </MapView>
 
       {Caminho ? (
-        <Button title="Stop Caminho" onPress={PararCaminho} />
+        <Button title="Parar Caminho" onPress={PararCaminho} />
       ) : (
-        <Button title="Start Caminho" onPress={ComecarCaminho} />
+        <Button title="Começar Caminho" onPress={ComecarCaminho} />
       )}
     </View>
   );
@@ -147,4 +176,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ExibirCaminho;
+export default CadastrarCaminho;
