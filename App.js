@@ -9,10 +9,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 import Home from './components/Home';
-import ExibirCaminho from './components/ExibirCaminho';
+import CadastrarCaminho from './components/CadastrarCaminho';
 import ListarRotas from './components/ListarRotas';
 
-// Configure o Parse
+
 Parse.setAsyncStorage(AsyncStorage);
 Parse.initialize('mztd62TNdIWwMtKqgZX8XPAs8nVjNkKWAzEBPQN3', 'bjkBkYiEaKV8i3PKbGZhukYfF4HzPIzlIyqAj4P7');
 Parse.serverURL = 'https://parseapi.back4app.com/';
@@ -50,8 +50,8 @@ function MyTabs() {
         }} 
       />
       <Tab.Screen 
-        name="ExibirCaminho" 
-        component={ExibirCaminho} 
+        name="CadastrarCaminho" 
+        component={CadastrarCaminho} 
         options={{ 
           tabBarIcon: ({ color, size }) => (
             <AntDesign name="car" size={size} color={color} />

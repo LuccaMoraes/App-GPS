@@ -14,12 +14,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5', // Adicionado para melhorar a aparência
+    backgroundColor: '#F5F5F5',
   },
   text: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333333', // Melhor contraste para leitura
+    color: '#333333', 
   },
 });
 
