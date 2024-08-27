@@ -4,15 +4,18 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { AntDesign } from '@expo/vector-icons';
+import Entypo from '@expo/vector-icons/Entypo';
+import Feather from '@expo/vector-icons/Feather';
 import Parse from 'parse/react-native.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 import Home from './components/Home';
-import ExibirCaminho from './components/ExibirCaminho';
+import CadastrarCaminho from './components/CadastrarCaminho';
 import ListarRotas from './components/ListarRotas';
+import MapaRota from './components/MapaRota';
 
-// Configure o Parse
+
 Parse.setAsyncStorage(AsyncStorage);
 Parse.initialize('mztd62TNdIWwMtKqgZX8XPAs8nVjNkKWAzEBPQN3', 'bjkBkYiEaKV8i3PKbGZhukYfF4HzPIzlIyqAj4P7');
 Parse.serverURL = 'https://parseapi.back4app.com/';
@@ -50,11 +53,11 @@ function MyTabs() {
         }} 
       />
       <Tab.Screen 
-        name="ExibirCaminho" 
-        component={ExibirCaminho} 
+        name="CadastrarCaminho" 
+        component={CadastrarCaminho} 
         options={{ 
           tabBarIcon: ({ color, size }) => (
-            <AntDesign name="car" size={size} color={color} />
+            <Feather name="map-pin" size={size} color={color} />
           ) 
         }} 
       />
@@ -64,6 +67,15 @@ function MyTabs() {
         options={{ 
           tabBarIcon: ({ color, size }) => (
             <AntDesign name="bars" size={size} color={color} />
+          ) 
+        }} 
+      />
+      <Tab.Screen 
+        name="MapaRota" 
+        component={MapaRota} 
+        options={{ 
+          tabBarIcon: ({ color, size }) => (
+            <Entypo name="map" size={size} color={color} />
           ) 
         }} 
       />
